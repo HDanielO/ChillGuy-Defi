@@ -1,80 +1,51 @@
 # ChillGuy DeFi Platform
 
-> A decentralized platform for fundraising campaigns and token rewards built on the Stacks blockchain.
+> A decentralized fundraising and reward platform built on the Stacks blockchain.
 
 ## Overview
 
-ChillGuy DeFi Platform is a blockchain-based solution that enables fundraising campaigns for charitable causes and community initiatives. The platform introduces ChillGuy Token (CfT), a fungible token that can be earned through donations and fitness challenges, creating a positive incentive loop for community involvement.
+ChillGuy DeFi Platform is a blockchain-based solution developed for the Code4Stacks challenge that enables community-driven fundraising campaigns and fitness-based token rewards. The platform introduces ChillGuy Token (CfT), a fungible token that incentivizes donations and fitness activities, creating a positive feedback loop for community engagement.
 
 ## Features
 
-- **Fungible Token**: ChillGuy Token (CfT) with 6 decimals and a capped supply of 1 billion tokens
-- **Campaign Creation**: Users can create fundraising campaigns with customizable goals
-- **Token-Based Donations**: Support campaigns by donating tokens
-- **Goal-Based Withdrawals**: Campaign creators can withdraw funds only when goals are met
-- **Token Rewards**: Earn ChillGuy tokens by participating in donations and fitness challenges
-- **Authorized Minting**: Secure token minting through an approved minters system
+- **ChillGuy Token (CfT)**: A fungible token with a capped supply of 1 billion tokens (with 6 decimals)
+- **Campaign Creation**: Create customizable fundraising campaigns with specific goals
+- **Token-Based Donations**: Support campaigns with token donations
+- **Goal-Based Withdrawals**: Campaign creators can withdraw funds once goals are met
+- **Fitness Rewards**: Earn tokens by participating in fitness challenges
+- **Donation Rewards**: Get token rewards for supporting campaigns
+- **Role-Based Access**: Secure system with authorized minters and owner-only functions
 
 ## Smart Contracts
 
-The platform consists of two main Clarity smart contracts:
+### ChillGuy Token (`chill-guy.clar`)
 
-### ChillGuy Token Contract (`chill-guy.clar`)
-
-A fungible token contract that manages the ChillGuy Token (CfT). It handles token minting, distribution, and transfers with features for:
-
-- Token minting by approved minters
-- Special distribution for donations and fitness challenges
-- Administration of approved minters
-- Token information and metadata management
-
-### Donation Management Contract (`donation-management.clar`)
-
-A contract that manages fundraising campaigns with features for:
-
-- Campaign creation with customizable goals
-- Token-based donations to campaigns
-- Secure withdrawal of funds when campaign goals are met
-- Administrative controls for campaign management
-- Detailed reporting of campaign metrics and donation history
-
-## Getting Started
-
-### Prerequisites
-
-- A Stacks wallet (like Hiro Wallet)
-- Stacks testnet or mainnet tokens for transaction fees
-
-### Installation
-
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/chillguy-defi.git
-   cd chillguy-defi
-   ```
-
-2. Deploy the contracts using Clarinet or the Stacks Explorer:
-   - Deploy `chill-guy.clar` first to establish the token
-   - Deploy `donation-management.clar` second for the campaign functionality
-
-### Usage
-
-#### Creating a Campaign
+A fungible token contract that manages the ChillGuy Token (CfT) with features for:
 
 ```clarity
-(contract-call? .donation-management create-campaign "Clean Ocean Initiative" "Fundraising for ocean cleanup efforts" u10000000)
+;; Mint new tokens (only by approved minters)
+(define-public (mint (amount uint) (recipient principal))...)
+
+;; Distribute tokens for donations
+(define-public (distribute-for-donation (amount uint) (donor principal))...)
+
+;; Distribute tokens for fitness challenges
+(define-public (distribute-for-fitness (amount uint) (user principal))...)
 ```
 
-#### Donating to a Campaign
+### Donation Management (`donation-management.clar`)
+
+Manages fundraising campaigns with features for:
 
 ```clarity
-(contract-call? .donation-management donate-to-campaign .chill-guy-token u1 u5000000)
-```
+;; Create a new fundraising campaign
+(define-public (create-campaign (name (string-ascii 100)) (description (string-utf8 500)) (goal uint))...)
 
-#### Withdrawing Campaign Funds (for campaign creators)
+;; Donate tokens to a campaign
+(define-public (donate-to-campaign (token <token-trait>) (campaign-id uint) (amount uint))...)
 
-```clarity
-(contract-call? .donation-management withdraw-campaign-funds .chill-guy-token u1)
+;; Withdraw funds from a campaign (only by campaign creator and if goal is met)
+(define-public (withdraw-campaign-funds (token <token-trait>) (campaign-id uint))...)
 ```
 
 ## Project Structure
@@ -82,29 +53,126 @@ A contract that manages fundraising campaigns with features for:
 ```
 chillguy-defi/
 ├── contracts/
-│   ├── chill-guy.clar         # ChillGuy Token contract
-│   └── donation-management.clar # Campaign management contract
-├── tests/                     # Contract test files
-├── README.md                  # This readme file
-└── LICENSE                    # Project license
+│   ├── chill-guy.clar            # ChillGuy Token contract
+│   └── donation-management.clar  # Campaign management contract
+├── settings/
+│   ├── Devnet.toml               # Devnet configuration
+│   ├── Mainnet.toml              # Mainnet configuration
+│   └── Testnet.toml              # Testnet configuration
+├── tests/
+│   └── chill-guy.test.ts         # Tests for the token contract
+├── .gitattributes                # Git repository files
+├── clarinet.toml                 # Clarinet project configuration
+├── package.json                  # Node.js package configuration
+├── tsconfig.json                 # TypeScript configuration
+├── vitest.config.js              # Vitest configuration
+└── README.md                     # This readme file
 ```
 
-## Development
+## Getting Started
 
-This project was built as part of the Code4Stacks challenge, utilizing the Clarity language for Stacks blockchain development.
+### Prerequisites
 
-### Testing
+- [Clarinet](https://github.com/hirosystems/clarinet) - Development toolchain for Clarity smart contracts
+- [Node.js](https://nodejs.org/) - For running tests and development tools
 
-To run tests locally, you can use Clarinet:
+### Installation
 
+1. Clone this repository:
+
+```bash
+git clone https://github.com/yourusername/chillguy-defi.git
+cd chillguy-defi
 ```
-clarinet test
+
+2. Install dependencies:
+
+```bash
+npm install
 ```
+
+3. Run tests:
+
+```bash
+npm test
+```
+
+### Development Environment
+
+The project uses Clarinet's simulated blockchain environment for development and testing:
+
+```bash
+# Start a local development console
+clarinet console
+
+# Deploy contracts to devnet
+clarinet deploy --devnet
+```
+
+## Usage Examples
+
+### Creating a Campaign
+
+```clarity
+(contract-call? .donation-management create-campaign
+  "Clean Ocean Initiative"
+  "Fundraising for ocean cleanup efforts"
+  u10000000)
+```
+
+### Donating to a Campaign
+
+```clarity
+(contract-call? .donation-management donate-to-campaign
+  .chill-guy-token
+  u1  ;; campaign ID
+  u5000000)  ;; donation amount
+```
+
+### Earning Tokens for Fitness Activities
+
+```clarity
+(contract-call? .chill-guy distribute-for-fitness
+  u100000  ;; token amount
+  tx-sender)  ;; recipient
+```
+
+## Deployment
+
+### Testnet Deployment
+
+1. Update your mnemonic in `settings/Testnet.toml`
+2. Deploy using Clarinet:
+
+```bash
+clarinet deploy --testnet
+```
+
+### Mainnet Deployment
+
+1. Update your mnemonic in `settings/Mainnet.toml`
+2. Deploy using Clarinet:
+
+```bash
+clarinet deploy --mainnet
+```
+
+## Testing
+
+Run the test suite using Vitest:
+
+```bash
+npm test
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 [MIT License](LICENSE)
 
-## Contributing
+## About the Code4Stacks Challenge
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project was developed as part of the Code4Stacks challenge, a hackathon focused on building innovative applications on the Stacks blockchain using Clarity smart contracts.
