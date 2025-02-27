@@ -1,5 +1,4 @@
-# Code-For-STX-NOV
+# ChillGuy-Defi
 
-PROGRAMMING IS FUN!!
 
-HERE IS MY CODE FOR STX SUBMISSION FOR NOV
+A decentralized platform for fundraising campaigns and token rewards built on the Stacks blockchain.
